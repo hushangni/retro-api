@@ -6,6 +6,7 @@ const { check, validationResult } = require('express-validator/check');
 
 const { SECRET } = require('../utils/constants');
 const User = require('../models/User');
+
 // @route  POST api/users
 // @desc   Register User
 // @access Public
@@ -42,12 +43,9 @@ router.post('/',
         });
 
         // Encrypt password using bcrypt
-        // more gensalt more secure but could take longer
         const salt = await bcrypt.genSalt(10);
 
-        // Creates a hash
         user.password = await bcrypt.hash(password, salt);
-
         await user.save();
 
         const payload = {
@@ -60,7 +58,7 @@ router.post('/',
         jwt.sign(
             payload,
             SECRET,
-            { expiresIn: 360000 },
+            { expiresIn: (60*60*24*90) }, // expires in 90 days // TODO add a refresh
             (err, token) => {
                 if (err) throw err;
                 res.json({ token });
