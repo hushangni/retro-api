@@ -9,21 +9,37 @@ const Year = require("../models/Year");
 // @desc    Return all years available
 // @access  Private
 router.get("/", auth, (req, res) => {
-  Year.find().then(years => res.json(years));
+  Year.find().sort({year: 1}).then(years => res.json(years));
 });
+
+// @route   GET api/years/:decade
+// @desc    Return all years in a certain decade
+// @access  Private
+router.get("/:decade", auth, (req, res) => {
+  Year.find({ decade: req.params.decade }).then(years => res.json(years));
+})
 
 // @route   POST api/years
 // @desc    Add new year
-// @access  Private
-router.post("/", auth, (req, res) => {
+// @access  Private/Admin
+router.post("/", auth, admin, (req, res) => {
   const newYear = new Year({
     year: req.body.year,
-    decade: req.body.decade,
-    isAdmin: req.body.isAdmin,
-    isVerified: req.body.isVerified
+    decade: req.body.decade
   });
   newYear.save().then(year => res.json(year));
 });
+
+// @route   GET api/years/:id
+// @desc    Return 1 specific year
+// @access  Private
+router.get("/:id", auth, (req, res) => {
+  Year.findById(req.params.id, (err, year) => {
+    if(err) {res.send(err)}
+
+    res.json(year);
+  })
+})
 
 // Define Routes
 router.use("/movies", require("./movies"));
