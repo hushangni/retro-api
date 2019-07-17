@@ -7,6 +7,7 @@ const { check, validationResult } = require('express-validator/check');
 const { SECRET } = require('../utils/constants');
 const User = require('../models/User');
 
+
 // @route  POST api/users
 // @desc   Register User
 // @access Public
@@ -55,7 +56,7 @@ router.post('/',
         jwt.sign(
             payload,
             SECRET,
-            { expiresIn: (60*60*24*90) }, // expires in 90 days // TODO add a refresh
+            { expiresIn: (60*60*24*365) }, // expires in 90 days // TODO add a refresh
             (err, token) => {
                 if (err) throw err;
                 res.json({ token });
