@@ -8,10 +8,10 @@ const { SECRET } = require('../utils/constants');
 const User = require('../models/User');
 
 
-// @route  POST api/users
+// @route  POST api/users/register
 // @desc   Register User
 // @access Public
-router.post('/',
+router.post('/register',
 [
     check('email', 'Please include a valid email').isEmail(),
     check('password', 'Please enter a password with 6 or more characters').isLength({ min: 6 })
@@ -53,20 +53,63 @@ router.post('/',
         }
 
         // Get JWT with userId
-        jwt.sign(
+        const token = jwt.sign(
             payload,
             SECRET,
             { expiresIn: (60*60*24*365) }, // expires in 90 days // TODO add a refresh
-            (err, token) => {
-                if (err) throw err;
-                res.json({ token });
-            }
         );
 
+        user.token = token;
+
+
         await user.save();
+
+        // send token back
+        res.status(201).json({
+            token
+        });
     } catch (err) {
         console.log(err.message);
         res.status(500).send('Server error');
+    }
+});
+
+// @route  POST api/users/login
+// @desc   Login User
+// @access Public
+router.post('/login',
+[
+    check('email', 'Please include a valid email').isEmail(),
+    check('password', 'Please enter a password with 6 or more characters').isLength({ min: 6 })
+], async (req, res) => {
+    const errors = validationResult(req);
+    // If there are errors, handle.
+    // Send back the error messages, can handle in front end
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { email, password } = req.body;
+
+    try {
+        // If user exists
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(400).json({ errors: [{ msg: 'Email invalid.' }] });
+        }
+        const match = await user.comparePassword(password);
+        if (match) {
+            // send token back
+            res.status(200).json({
+               user
+            });
+        } else {
+            return res.status(400).json({ errors: [{ msg: 'Password invalid.' }] });
+        }
+
+    } catch (err) {
+        console.log(err.message);
+        res.status(400).json({ errors: [{ msg: 'Login failed.' }] });
     }
 });
 
