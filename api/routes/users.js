@@ -7,6 +7,12 @@ const { check, validationResult } = require('express-validator/check');
 const { SECRET } = require('../utils/constants');
 const User = require('../models/User');
 
+router.use(function (req, res, next) {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    next();
+});
+
 
 // @route  POST api/users/register
 // @desc   Register User
