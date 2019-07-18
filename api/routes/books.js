@@ -16,7 +16,7 @@ router.post("/add/:id", auth, admin, (req, res) => {
     }
     let newBook = new Book({
       title: req.body.title,
-      artist: req.body.author,
+      author: req.body.author,
       year: year._id
     });
     newBook.save((err, book) => {

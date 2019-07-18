@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const BookSchema = new mongoose.Schema({
     title: String,
-    artist: String,
+    author: String,
     year: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Year'
