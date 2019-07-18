@@ -3,7 +3,7 @@ const { SECRET } = require("../utils/constants");
 
 module.exports = function(req, res, next) {
   // Get token from header
-  const token = req.header("apiKey");
+  const token = req.query.apiKey
 
   // Check if no token
   if (!token) {

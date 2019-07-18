@@ -9,14 +9,26 @@ const Year = require("../models/Year");
 // @desc    Return all years available
 // @access  Private
 router.get("/", auth, (req, res) => {
-  Year.find().sort({year: 1}).then(years => res.json(years));
+  if (req.query.sort === "asc") {
+    Year.find().sort({ year: 1 }).then(years => res.json(years));
+  } else if (req.query.sort === "desc") {
+    Year.find().sort({ year: -1 }).then(years => res.json(years));
+  } else {
+    Year.find().then(years => res.json(years));
+  }
 });
 
-// @route   GET api/years/:decade
+// @route   GET api/years/decade
 // @desc    Return all years in a certain decade
 // @access  Private
-router.get("/:decade", auth, (req, res) => {
-  Year.find({ decade: req.params.decade }).then(years => res.json(years));
+router.get("/decade", auth, (req, res) => {
+  if (req.query.sort === "asc") {
+    Year.find({ decade: req.query.decade }).sort({ year: 1 }).then(years => res.json(years));
+  } else if (req.query.sort === 'desc') {
+    Year.find({ decade: req.query.decade }).sort({ year: -1 }).then(years => res.json(years));
+  } else {
+    Year.find({ decade: req.query.decade }).then(years => res.json(years));
+  }
 })
 
 // @route   POST api/years
@@ -30,15 +42,14 @@ router.post("/", auth, admin, (req, res) => {
   newYear.save().then(year => res.json(year));
 });
 
-// @route   GET api/years/:id
+// @route   GET api/years/year
 // @desc    Return 1 specific year
 // @access  Private
-router.get("/:id", auth, (req, res) => {
-  Year.findById(req.params.id, (err, year) => {
-    if(err) {res.send(err)}
-
-    res.json(year);
-  })
+router.get("/year", auth, (req, res) => {
+  typeof(req.query.year)
+  Year.find({ year: req.query.year })
+    .then( year => res.json(year) )
+    .catch( err => res.json(err) );
 })
 
 // Define Routes
